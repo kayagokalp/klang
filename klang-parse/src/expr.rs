@@ -50,15 +50,10 @@ fn parse_binary_expr(
     let mut result = lhs.clone();
     let parser_settings = ParserSettings::default();
     let mut parsed_tokens = Vec::new();
-    loop {
-        // continue until the current token is not an operator
-        // or it is an operator with precedence lesser than expr_precedence
-        let (operator, precedence) = match tokens.last() {
-            Some(&Token::Operator(ref op)) => match parser_settings.operator_precedence.get(op) {
-                Some(pr) if *pr >= expr_precedence => (op.clone(), *pr),
-                None => return error("unknown operator found"),
-                _ => break,
-            },
+    while let Some(Token::Operator(op)) = tokens.last().cloned() {
+        let (operator, precedence) = match parser_settings.operator_precedence.get(&op) {
+            Some(precedence) if *precedence >= expr_precedence => (op, precedence),
+            None => return error("unknown operator found"),
             _ => break,
         };
         tokens.pop();
@@ -69,25 +64,19 @@ fn parse_binary_expr(
         let mut rhs = parse_try!(rhs_partial_parse, tokens, parsed_tokens);
         // parse all the RHS operators until their precedence is
         // bigger than the current one
-        loop {
-            let binary_rhs = match tokens.last().map(|i| i.clone()) {
-                Some(Token::Operator(ref op)) => {
-                    match parser_settings.operator_precedence.get(op).map(|i| *i) {
-                        Some(pr) if pr > precedence => {
-                            let binary_expr_partial_parse =
-                                parse_binary_expr(tokens, expr_precedence, &rhs);
-                            parse_try!(binary_expr_partial_parse, tokens, parsed_tokens)
-                        }
-                        None => return error("unknown operator found"),
-                        _ => break,
-                    }
+        while let Some(Token::Operator(op)) = tokens.last().cloned() {
+            let binary_rhs = match parser_settings.operator_precedence.get(&op) {
+                Some(pr) if pr > precedence => {
+                    let binary_expr_partial_parse =
+                        parse_binary_expr(tokens, expr_precedence, &rhs);
+                    parse_try!(binary_expr_partial_parse, tokens, parsed_tokens)
                 }
+                None => return error("unknown operator found"),
                 _ => break,
             };
-
             rhs = binary_rhs;
         }
-        result = Expression::Binary(operator, Box::new(result), Box::new(rhs));
+        result = Expression::Binary(operator.to_string(), Box::new(result), Box::new(rhs));
     }
 
     PartParsingResult::Good(result, parsed_tokens)
