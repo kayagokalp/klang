@@ -35,7 +35,7 @@ impl Parse<Expression> for Expression {
             Some(&Token::Number(_)) => parse_literal_expr(tokens),
             Some(&Token::OpeningParenthesis) => parse_parenthesis_expr(tokens),
             None => PartParsingResult::NotComplete,
-            _ => error("unknow token when expecting an expression"),
+            _ => error("unknown token when expecting an expression"),
         }
     }
 }

@@ -1,5 +1,6 @@
 use crate::{
-    parse::{Parse, PartParsingResult},
+    expect_token,
+    parse::{error, Parse, PartParsingResult},
     parse_try,
     token::Token,
 };
@@ -16,9 +17,19 @@ impl Parse<ASTNode> for Function {
         let mut parsed_tokens = vec![Token::Fun];
         let prototype_partial_parsing = Prototype::parse(tokens);
         let prototype = parse_try!(prototype_partial_parsing, tokens, parsed_tokens);
+        expect_token!(
+            [Token::OpeningBrace, Token::OpeningBrace, ()] <= tokens,
+            parsed_tokens,
+            "'{' expected"
+        );
 
         let expr_partial_parsing = Expression::parse(tokens);
         let body = parse_try!(expr_partial_parsing, tokens, parsed_tokens);
+        expect_token!(
+            [Token::ClosingBrace, Token::ClosingBrace, ()] <= tokens,
+            parsed_tokens,
+            "'}' expected"
+        );
 
         PartParsingResult::Good(
             ASTNode::FunctionNode(Function { prototype, body }),

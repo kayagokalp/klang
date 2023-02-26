@@ -3,18 +3,18 @@ use crate::{
     token::Token,
 };
 use klang_ast::{
+    expr::Expression,
     function::{Function, Prototype},
     node::ASTNode,
 };
 
+#[allow(dead_code)]
 pub fn parse(tokens: &[Token], parsed_tree: &[ASTNode]) -> ParsingResult {
     let mut token_stream = tokens.to_vec();
     token_stream.reverse();
     let mut parsed_tree = parsed_tree.to_vec();
 
     loop {
-        // look at the current token and determine what to parse
-        // based on its value
         let cur_token = match token_stream.last() {
             Some(token) => token.clone(),
             None => break,
@@ -23,8 +23,11 @@ pub fn parse(tokens: &[Token], parsed_tree: &[ASTNode]) -> ParsingResult {
         let result = match cur_token {
             Token::Fun => Function::parse(&mut token_stream),
             Token::Pub => Prototype::parse(&mut token_stream),
-            Token::Delimiter => todo!(),
-            _ => todo!(),
+            Token::Delimiter => {
+                token_stream.pop();
+                continue;
+            }
+            _ => Expression::parse(&mut token_stream),
         };
 
         match result {
