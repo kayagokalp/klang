@@ -202,4 +202,31 @@ mod test {
 
         assert_eq!(parse_result, expected_result)
     }
+
+    #[test]
+    fn parse_expr_literal_binary() {
+        let input_str = r#"5 + 4 * 2"#;
+        let token_stream = lexer::tokenize(input_str).unwrap();
+        let parse_result = parse(&token_stream, &[]).unwrap();
+        let expected_tree = vec![ASTNode::FunctionNode(Function {
+            prototype: Prototype {
+                name: "".to_string(),
+                args: vec![],
+            },
+            body: Expression::Binary(
+                "+".to_string(),
+                Box::new(Expression::Literal(5.0)),
+                Box::new(Expression::Binary(
+                    "*".to_string(),
+                    Box::new(Expression::Literal(4.0)),
+                    Box::new(Expression::Literal(2.0)),
+                )),
+            ),
+        })];
+
+        let left_tokens = vec![];
+        let expected_result = (expected_tree, left_tokens);
+
+        assert_eq!(parse_result, expected_result)
+    }
 }
