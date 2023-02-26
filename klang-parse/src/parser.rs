@@ -14,13 +14,8 @@ pub fn parse(tokens: &[Token], parsed_tree: &[ASTNode]) -> ParsingResult {
     token_stream.reverse();
     let mut parsed_tree = parsed_tree.to_vec();
 
-    loop {
-        let cur_token = match token_stream.last() {
-            Some(token) => token.clone(),
-            None => break,
-        };
-
-        let result = match cur_token {
+    while let Some(token) = token_stream.last() {
+        let result = match token {
             Token::Fun => Function::parse(&mut token_stream),
             Token::Pub => Prototype::parse(&mut token_stream),
             Token::Delimiter => {
