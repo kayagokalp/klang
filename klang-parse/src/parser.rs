@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{
     parse::{Parse, ParsingResult, PartParsingResult},
     token::Token,
@@ -7,6 +9,25 @@ use klang_ast::{
     function::{Function, Prototype},
     node::ASTNode,
 };
+
+#[derive(Debug)]
+pub struct ParserSettings {
+    pub operator_precedence: HashMap<String, i32>,
+}
+
+impl Default for ParserSettings {
+    fn default() -> Self {
+        let mut operator_precedence = HashMap::new();
+        operator_precedence.insert("<".to_string(), 10);
+        operator_precedence.insert("+".to_string(), 20);
+        operator_precedence.insert("-".to_string(), 20);
+        operator_precedence.insert("*".to_string(), 40);
+
+        Self {
+            operator_precedence,
+        }
+    }
+}
 
 #[allow(dead_code)]
 pub fn parse(tokens: &[Token], parsed_tree: &[ASTNode]) -> ParsingResult {

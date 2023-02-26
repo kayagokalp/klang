@@ -2,6 +2,7 @@ use crate::{
     expect_token,
     parse::{error, Parse, PartParsingResult},
     parse_try,
+    parser::ParserSettings,
     token::Token,
 };
 use klang_ast::{
@@ -30,13 +31,75 @@ impl Parse<ASTNode> for Expression {
 
 impl Parse<Expression> for Expression {
     fn parse(tokens: &mut Vec<Token>) -> PartParsingResult<Expression> {
-        match tokens.last() {
-            Some(&Token::Ident(_)) => parse_ident_expr(tokens),
-            Some(&Token::Number(_)) => parse_literal_expr(tokens),
-            Some(&Token::OpeningParenthesis) => parse_parenthesis_expr(tokens),
-            None => PartParsingResult::NotComplete,
-            _ => error("unknown token when expecting an expression"),
+        let mut parsed_tokens = Vec::new();
+        let lhs_partial_parse = parse_primary_expr(tokens);
+        let lhs = parse_try!(lhs_partial_parse, tokens, parsed_tokens);
+
+        let starting_precedence = 0;
+        let expr_partial_parse = parse_binary_expr(tokens, starting_precedence, &lhs);
+        let expr = parse_try!(expr_partial_parse, tokens, parsed_tokens);
+        PartParsingResult::Good(expr, parsed_tokens)
+    }
+}
+
+fn parse_binary_expr(
+    tokens: &mut Vec<Token>,
+    expr_precedence: i32,
+    lhs: &Expression,
+) -> PartParsingResult<Expression> {
+    let mut result = lhs.clone();
+    let parser_settings = ParserSettings::default();
+    let mut parsed_tokens = Vec::new();
+    loop {
+        // continue until the current token is not an operator
+        // or it is an operator with precedence lesser than expr_precedence
+        let (operator, precedence) = match tokens.last() {
+            Some(&Token::Operator(ref op)) => match parser_settings.operator_precedence.get(op) {
+                Some(pr) if *pr >= expr_precedence => (op.clone(), *pr),
+                None => return error("unknown operator found"),
+                _ => break,
+            },
+            _ => break,
+        };
+        tokens.pop();
+        parsed_tokens.push(Token::Operator(operator.clone()));
+
+        // parse primary RHS expression
+        let rhs_partial_parse = parse_primary_expr(tokens);
+        let mut rhs = parse_try!(rhs_partial_parse, tokens, parsed_tokens);
+        // parse all the RHS operators until their precedence is
+        // bigger than the current one
+        loop {
+            let binary_rhs = match tokens.last().map(|i| i.clone()) {
+                Some(Token::Operator(ref op)) => {
+                    match parser_settings.operator_precedence.get(op).map(|i| *i) {
+                        Some(pr) if pr > precedence => {
+                            let binary_expr_partial_parse =
+                                parse_binary_expr(tokens, expr_precedence, &rhs);
+                            parse_try!(binary_expr_partial_parse, tokens, parsed_tokens)
+                        }
+                        None => return error("unknown operator found"),
+                        _ => break,
+                    }
+                }
+                _ => break,
+            };
+
+            rhs = binary_rhs;
         }
+        result = Expression::Binary(operator, Box::new(result), Box::new(rhs));
+    }
+
+    PartParsingResult::Good(result, parsed_tokens)
+}
+
+fn parse_primary_expr(tokens: &mut Vec<Token>) -> PartParsingResult<Expression> {
+    match tokens.last() {
+        Some(&Token::Ident(_)) => parse_ident_expr(tokens),
+        Some(&Token::Number(_)) => parse_literal_expr(tokens),
+        Some(&Token::OpeningParenthesis) => parse_parenthesis_expr(tokens),
+        None => PartParsingResult::NotComplete,
+        _ => error("unknown token when expecting an expression"),
     }
 }
 
