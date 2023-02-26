@@ -1,3 +1,3 @@
-mod expr;
-mod function;
-mod node;
+pub mod expr;
+pub mod function;
+pub mod node;

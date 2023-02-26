@@ -26,6 +26,7 @@ name = "klang-parse"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "klang-ast",
  "regex",
 ]
 
