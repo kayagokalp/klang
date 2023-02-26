@@ -36,7 +36,7 @@ mod test {
     }
 
     #[test]
-    fn parse_function_definition_with_lefotver_tokens() {
+    fn parse_function_definition_with_leftover_tokens() {
         let input_str = r#"pub kaya(); pub"#;
         let token_stream = lexer::tokenize(input_str).unwrap();
         let parse_result = parse(&token_stream, &[]).unwrap();
@@ -84,6 +84,120 @@ mod test {
         })];
 
         let left_tokens = vec![Token::Fun];
+        let expected_result = (expected_tree, left_tokens);
+
+        assert_eq!(parse_result, expected_result)
+    }
+
+    #[test]
+    fn parse_expr_literal() {
+        let input_str = r#"5"#;
+        let token_stream = lexer::tokenize(input_str).unwrap();
+        let parse_result = parse(&token_stream, &[]).unwrap();
+        let expected_tree = vec![ASTNode::FunctionNode(Function {
+            prototype: Prototype {
+                name: "".to_string(),
+                args: vec![],
+            },
+            body: Expression::Literal(5.0),
+        })];
+
+        let left_tokens = vec![];
+        let expected_result = (expected_tree, left_tokens);
+
+        assert_eq!(parse_result, expected_result)
+    }
+
+    #[test]
+    fn parse_expr_literal_with_leftover_tokens() {
+        let input_str = r#"5 fun"#;
+        let token_stream = lexer::tokenize(input_str).unwrap();
+        let parse_result = parse(&token_stream, &[]).unwrap();
+        let expected_tree = vec![ASTNode::FunctionNode(Function {
+            prototype: Prototype {
+                name: "".to_string(),
+                args: vec![],
+            },
+            body: Expression::Literal(5.0),
+        })];
+
+        let left_tokens = vec![Token::Fun];
+        let expected_result = (expected_tree, left_tokens);
+
+        assert_eq!(parse_result, expected_result)
+    }
+
+    #[test]
+    fn parse_expr_variable() {
+        let input_str = r#"x"#;
+        let token_stream = lexer::tokenize(input_str).unwrap();
+        let parse_result = parse(&token_stream, &[]).unwrap();
+        let expected_tree = vec![ASTNode::FunctionNode(Function {
+            prototype: Prototype {
+                name: "".to_string(),
+                args: vec![],
+            },
+            body: Expression::Variable("x".to_string()),
+        })];
+
+        let left_tokens = vec![];
+        let expected_result = (expected_tree, left_tokens);
+
+        assert_eq!(parse_result, expected_result)
+    }
+
+    #[test]
+    fn parse_expr_variable_with_leftover_tokens() {
+        let input_str = r#"x fun"#;
+        let token_stream = lexer::tokenize(input_str).unwrap();
+        let parse_result = parse(&token_stream, &[]).unwrap();
+        let expected_tree = vec![ASTNode::FunctionNode(Function {
+            prototype: Prototype {
+                name: "".to_string(),
+                args: vec![],
+            },
+            body: Expression::Variable("x".to_string()),
+        })];
+
+        let left_tokens = vec![Token::Fun];
+        let expected_result = (expected_tree, left_tokens);
+
+        assert_eq!(parse_result, expected_result)
+    }
+
+    #[test]
+    fn parse_expr_call() {
+        let input_str = r#"x()"#;
+        let token_stream = lexer::tokenize(input_str).unwrap();
+        let parse_result = parse(&token_stream, &[]).unwrap();
+        let expected_tree = vec![ASTNode::FunctionNode(Function {
+            prototype: Prototype {
+                name: "".to_string(),
+                args: vec![],
+            },
+            body: Expression::Call("x".to_string(), vec![]),
+        })];
+
+        let left_tokens = vec![];
+        let expected_result = (expected_tree, left_tokens);
+
+        assert_eq!(parse_result, expected_result)
+    }
+
+    #[test]
+    fn parse_expr_call_with_leftover_tokens() {
+        let input_str = r#"x() pub"#;
+        let token_stream = lexer::tokenize(input_str).unwrap();
+        let parse_result = parse(&token_stream, &[]).unwrap();
+        let expected_tree = vec![ASTNode::FunctionNode(Function {
+            prototype: Prototype {
+                name: "".to_string(),
+                args: vec![],
+            },
+            body: Expression::Call("x".to_string(), vec![]),
+        })];
+
+        let left_tokens = vec![Token::Pub];
         let expected_result = (expected_tree, left_tokens);
 
         assert_eq!(parse_result, expected_result)
