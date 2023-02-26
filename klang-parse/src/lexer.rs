@@ -1,7 +1,9 @@
 use crate::token::Token;
 
+#[allow(dead_code)]
 type TokenStream = Vec<Token>;
 
+#[allow(dead_code)]
 pub fn tokenize(input: &str) -> anyhow::Result<TokenStream> {
     // regex for commentaries (start with #, end with the line end)
     let comment_re = regex::Regex::new(r"(?m)#.*\n")?;
