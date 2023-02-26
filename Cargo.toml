@@ -1,3 +1,3 @@
 [workspace]
 
-members = ["klang-parse"]
+members = ["klang-parse", "klang-ast"]
