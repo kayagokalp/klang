@@ -20,6 +20,8 @@ pub fn tokenize(input: &str) -> anyhow::Result<TokenStream> {
         r"(?P<delimiter>;)|",
         r"(?P<oppar>\()|",
         r"(?P<clpar>\))|",
+        r"(?P<opbrace>\{)|",
+        r"(?P<clbrace>\})|",
         r"(?P<comma>,)|",
         r"(?P<operator>\S)"
     ))?;
@@ -44,7 +46,12 @@ pub fn tokenize(input: &str) -> anyhow::Result<TokenStream> {
             Token::ClosingParenthesis
         } else if cap.name("comma").is_some() {
             Token::Comma
-        } else {
+        } else if cap.name("opbrace").is_some(){
+            Token::OpeningBrace
+        } else if cap.name("clbrace").is_some(){
+            Token::ClosingBrace
+        }
+        else{
             let operator = cap
                 .name("operator")
                 .ok_or_else(|| anyhow::anyhow!("lexer failed trying to get operator"))?;
@@ -55,4 +62,67 @@ pub fn tokenize(input: &str) -> anyhow::Result<TokenStream> {
     }
 
     Ok(result)
+}
+
+#[cfg(test)]
+mod test {
+    use crate::token::Token;
+    use super::tokenize;
+
+    #[test]
+    fn test_lex_pub_keyword() {
+        let input_str = r#"pub"#;
+        let token_stream = tokenize(input_str).unwrap();
+        let expected = vec![Token::Pub];
+        assert_eq!(token_stream, expected)
+    }
+
+    #[test]
+    fn test_lex_fun_keyword() {
+        let input_str = r#"fun"#;
+        let token_stream = tokenize(input_str).unwrap();
+        let expected = vec![Token::Fun];
+        assert_eq!(token_stream, expected)
+    }
+
+    #[test]
+    fn test_lex_ident() {
+        let input_str = r#"this is a ident"#;
+        let token_stream = tokenize(input_str).unwrap();
+        let expected = vec![Token::Ident("this".to_string()), Token::Ident("is".to_string()), Token::Ident("a".to_string()), Token::Ident("ident".to_string())];
+        assert_eq!(token_stream, expected)
+    }
+
+    #[test]
+    fn test_lex_paranthesis() {
+        let input_str = r#"()"#;
+        let token_stream = tokenize(input_str).unwrap();
+        let expected = vec![Token::OpeningParenthesis, Token::ClosingParenthesis];
+        assert_eq!(token_stream, expected)
+    }
+
+    #[test]
+    fn test_lex_braces() {
+        let input_str = r#"{}"#;
+        let token_stream = tokenize(input_str).unwrap();
+        let expected = vec![Token::OpeningBrace, Token::ClosingBrace];
+        assert_eq!(token_stream, expected)
+    }
+
+    #[test]
+    fn test_lex_fun_decl() {
+        let input_str = r#"fun this_is_a_decl() {}"#;
+        let token_stream = tokenize(input_str).unwrap();
+        let expected = vec![Token::Fun, Token::Ident("this_is_a_decl".to_string()), Token::OpeningParenthesis, Token::ClosingParenthesis, Token::OpeningBrace, Token::ClosingBrace];
+        assert_eq!(token_stream, expected)
+    }
+
+    #[test]
+    fn test_lex_number() {
+        let input_str = r#"102"#;
+        let token_stream = tokenize(input_str).unwrap();
+        let expected = vec![Token::Number(102.0)];
+        assert_eq!(token_stream, expected)
+    }
+
 }

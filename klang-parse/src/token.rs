@@ -5,6 +5,8 @@ pub enum Token {
     Delimiter, //';' character
     OpeningParenthesis,
     ClosingParenthesis,
+    OpeningBrace,
+    ClosingBrace,
     Comma,
     Ident(String),
     Number(f64),
