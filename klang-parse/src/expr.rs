@@ -1,7 +1,8 @@
 use crate::{
-    parse::{Parse, PartParsingResult, error},
+    expect_token,
+    parse::{error, Parse, PartParsingResult},
     parse_try,
-    token::Token, expect_token,
+    token::Token,
 };
 use klang_ast::{
     expr::Expression,
@@ -34,7 +35,7 @@ impl Parse<Expression> for Expression {
             Some(&Token::Number(_)) => parse_literal_expr(tokens),
             Some(&Token::OpeningParenthesis) => parse_parenthesis_expr(tokens),
             None => PartParsingResult::NotComplete,
-            _ => error("unknow token when expecting an expression")
+            _ => error("unknow token when expecting an expression"),
         }
     }
 }
@@ -43,9 +44,11 @@ fn parse_ident_expr(tokens: &mut Vec<Token>) -> PartParsingResult<Expression> {
     let mut parsed_tokens = Vec::new();
     let name = expect_token!(
         [Token::Ident(name), Token::Ident(name.clone()), name] <= tokens,
-        parsed_tokens, "identificator expected");
+        parsed_tokens,
+        "identificator expected"
+    );
 
-     expect_token!(
+    expect_token!(
         [Token::OpeningParenthesis, Token::OpeningParenthesis, ()]
         else {return PartParsingResult::Good(Expression::Variable(name), parsed_tokens)}
         <= tokens, parsed_tokens);
@@ -70,12 +73,14 @@ fn parse_literal_expr(tokens: &mut Vec<Token>) -> PartParsingResult<Expression> 
 
     let value = expect_token!(
         [Token::Number(val), Token::Number(val), val] <= tokens,
-        parsed_tokens, "literal expected");
+        parsed_tokens,
+        "literal expected"
+    );
 
     PartParsingResult::Good(Expression::Literal(value), parsed_tokens)
 }
 
-fn parse_parenthesis_expr(tokens : &mut Vec<Token>) -> PartParsingResult<Expression> {
+fn parse_parenthesis_expr(tokens: &mut Vec<Token>) -> PartParsingResult<Expression> {
     // Consume `(`.
     tokens.pop();
     let mut parsed_tokens = vec![Token::OpeningParenthesis];
@@ -84,7 +89,9 @@ fn parse_parenthesis_expr(tokens : &mut Vec<Token>) -> PartParsingResult<Express
 
     expect_token!(
         [Token::ClosingParenthesis, Token::ClosingParenthesis, ()] <= tokens,
-        parsed_tokens, "')' expected");
+        parsed_tokens,
+        "')' expected"
+    );
 
     PartParsingResult::Good(expr, parsed_tokens)
 }
