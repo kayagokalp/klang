@@ -5,4 +5,5 @@ edition = "2021"
 
 [dependencies]
 anyhow  = "1"
+klang-ast = { path = "../klang-ast/" }
 regex = "1.7"
