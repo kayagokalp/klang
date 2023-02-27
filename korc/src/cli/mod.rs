@@ -1,7 +1,7 @@
 mod build;
 
 use anyhow::Result;
-use build::Command as BuildCommand;
+pub use build::Command as BuildCommand;
 use clap::{Parser, Subcommand};
 
 #[derive(Debug, Parser)]

@@ -9,5 +9,5 @@ pub struct Command {
 }
 
 pub(crate) fn exec(build_command: Command) -> Result<()> {
-    todo!()
+    crate::ops::korc_build::build(build_command)
 }
