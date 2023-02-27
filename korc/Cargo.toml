@@ -1,0 +1,17 @@
+[package]
+name = "korc"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0"
+clap = { version = "4.1.6", features = ["derive"] }
+klang-core = { path = "../klang-core/" }
+
+[lib]
+name = "korc"
+path = "src/lib.rs"
+
+[[bin]]
+name = "korc"
+path = "src/main.rs"

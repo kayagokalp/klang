@@ -1,11 +1,11 @@
 mod expr;
 mod function;
-mod lexer;
+pub mod lexer;
 mod parse;
-mod parser;
+pub mod parser;
 mod prototype;
 mod r#pub;
-mod token;
+pub mod token;
 
 #[cfg(test)]
 mod test {
