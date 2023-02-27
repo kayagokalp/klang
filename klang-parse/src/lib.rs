@@ -61,7 +61,7 @@ mod test {
                 name: "kaya".to_string(),
                 args: vec![],
             },
-            body: Expression::Literal(5.0),
+            body: Some(Expression::Literal(5.0)),
         })];
 
         let left_tokens = vec![];
@@ -80,7 +80,7 @@ mod test {
                 name: "kaya".to_string(),
                 args: vec![],
             },
-            body: Expression::Literal(5.0),
+            body: Some(Expression::Literal(5.0)),
         })];
 
         let left_tokens = vec![Token::Fun];
@@ -99,7 +99,7 @@ mod test {
                 name: "".to_string(),
                 args: vec![],
             },
-            body: Expression::Literal(5.0),
+            body: Some(Expression::Literal(5.0)),
         })];
 
         let left_tokens = vec![];
@@ -118,7 +118,7 @@ mod test {
                 name: "".to_string(),
                 args: vec![],
             },
-            body: Expression::Literal(5.0),
+            body: Some(Expression::Literal(5.0)),
         })];
 
         let left_tokens = vec![Token::Fun];
@@ -137,7 +137,7 @@ mod test {
                 name: "".to_string(),
                 args: vec![],
             },
-            body: Expression::Variable("x".to_string()),
+            body: Some(Expression::Variable("x".to_string())),
         })];
 
         let left_tokens = vec![];
@@ -156,7 +156,7 @@ mod test {
                 name: "".to_string(),
                 args: vec![],
             },
-            body: Expression::Variable("x".to_string()),
+            body: Some(Expression::Variable("x".to_string())),
         })];
 
         let left_tokens = vec![Token::Fun];
@@ -175,7 +175,7 @@ mod test {
                 name: "".to_string(),
                 args: vec![],
             },
-            body: Expression::Call("x".to_string(), vec![]),
+            body: Some(Expression::Call("x".to_string(), vec![])),
         })];
 
         let left_tokens = vec![];
@@ -194,7 +194,7 @@ mod test {
                 name: "".to_string(),
                 args: vec![],
             },
-            body: Expression::Call("x".to_string(), vec![]),
+            body: Some(Expression::Call("x".to_string(), vec![])),
         })];
 
         let left_tokens = vec![Token::Pub];
@@ -213,7 +213,7 @@ mod test {
                 name: "".to_string(),
                 args: vec![],
             },
-            body: Expression::Binary(
+            body: Some(Expression::Binary(
                 "+".to_string(),
                 Box::new(Expression::Literal(5.0)),
                 Box::new(Expression::Binary(
@@ -221,7 +221,7 @@ mod test {
                     Box::new(Expression::Literal(4.0)),
                     Box::new(Expression::Literal(2.0)),
                 )),
-            ),
+            )),
         })];
 
         let left_tokens = vec![];

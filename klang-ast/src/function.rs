@@ -3,7 +3,7 @@ use crate::expr::Expression;
 #[derive(PartialEq, Clone, Debug)]
 pub struct Function {
     pub prototype: Prototype,
-    pub body: Expression,
+    pub body: Option<Expression>,
 }
 
 #[derive(PartialEq, Clone, Debug)]

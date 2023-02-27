@@ -22,7 +22,7 @@ impl Parse<ASTNode> for Expression {
         };
         let lambda = Function {
             prototype,
-            body: expression,
+            body: Some(expression),
         };
 
         PartParsingResult::Good(ASTNode::FunctionNode(lambda), parsed_tokens)
