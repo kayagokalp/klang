@@ -12,6 +12,7 @@ use inkwell::{
 use klang_ast::{
     expr::Expression,
     function::{Function, Prototype},
+    node::ASTNode,
 };
 
 /// Defines the `Expr` compiler.
@@ -33,14 +34,21 @@ impl<'a, 'ctx> Compiler<'a, 'ctx> {
         builder: &'a Builder<'ctx>,
         pass_manager: &'a PassManager<FunctionValue<'ctx>>,
         module: &'a Module<'ctx>,
-        function: &Function,
+        ast_node: &'a ASTNode,
     ) -> Result<FunctionValue<'ctx>, &'static str> {
+        let function = match ast_node {
+            ASTNode::ExternNode(extern_node) => Function {
+                prototype: extern_node.clone(),
+                body: None,
+            },
+            ASTNode::FunctionNode(function_node) => function_node.clone(),
+        };
         let mut compiler = Compiler {
             context,
             builder,
             fpm: pass_manager,
             module,
-            function,
+            function: &function,
             fn_value_opt: None,
             variables: HashMap::new(),
         };
@@ -202,6 +210,11 @@ impl<'a, 'ctx> Compiler<'a, 'ctx> {
         let proto = &self.function.prototype;
         let function = self.compile_prototype(proto)?;
 
+        // got external function, returning only compiled prototype
+        if self.function.body.is_none() {
+            return Ok(function);
+        }
+
         let entry = self.context.append_basic_block(function, "entry");
 
         self.builder.position_at_end(entry);
@@ -222,7 +235,7 @@ impl<'a, 'ctx> Compiler<'a, 'ctx> {
         }
 
         // compile body
-        let body = self.compile_expr(&self.function.body)?;
+        let body = self.compile_expr(self.function.body.as_ref().unwrap())?;
 
         self.builder.build_return(Some(&body));
 

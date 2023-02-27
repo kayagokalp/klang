@@ -24,7 +24,7 @@ impl Parse<ASTNode> for Function {
         );
 
         let expr_partial_parsing = Expression::parse(tokens);
-        let body = parse_try!(expr_partial_parsing, tokens, parsed_tokens);
+        let body = Some(parse_try!(expr_partial_parsing, tokens, parsed_tokens));
         expect_token!(
             [Token::ClosingBrace, Token::ClosingBrace, ()] <= tokens,
             parsed_tokens,
