@@ -1,0 +1,9 @@
+[package]
+name = "klang-core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0"
+klang-ast = { path = "../klang-ast" }
+klang-parse = { path = "../klang-parse/" }
