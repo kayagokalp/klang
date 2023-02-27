@@ -6,8 +6,8 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0"
 clap = { version = "4.1.6", features = ["derive"] }
-klang-core = { path = "../klang-core/" }
 inkwell = { git = "https://github.com/TheDan64/inkwell", branch = "master", features = ["llvm13-0"] }
+klang-core = { path = "../klang-core/" }
 
 [lib]
 name = "korc"
