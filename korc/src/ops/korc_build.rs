@@ -24,7 +24,7 @@ pub fn build(cmd: BuildCommand) -> Result<()> {
         if cmd.file_out {
             let path = current_dir.join(KLANG_DEFAULT_AST_FILE_NAME);
             std::fs::write(path, ast_str)?;
-        }else {
+        } else {
             println!("{ast_str}");
         }
     }
@@ -42,7 +42,7 @@ pub fn build(cmd: BuildCommand) -> Result<()> {
             if !success {
                 anyhow::bail!("failed to write bitcode into file")
             }
-        }else {
+        } else {
             module.print_to_stderr()
         }
     }
