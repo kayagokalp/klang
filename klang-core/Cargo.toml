@@ -7,3 +7,4 @@ edition = "2021"
 anyhow = "1.0"
 klang-ast = { path = "../klang-ast" }
 klang-parse = { path = "../klang-parse/" }
+inkwell = { git = "https://github.com/TheDan64/inkwell", branch = "master", features = ["llvm13-0"] }
