@@ -4,8 +4,8 @@ pub mod lexer;
 mod parse;
 pub mod parser;
 mod prototype;
-mod r#use;
 pub mod token;
+mod r#use;
 
 #[cfg(test)]
 mod test {
