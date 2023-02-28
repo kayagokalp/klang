@@ -5,4 +5,9 @@ pub enum Expression {
     Variable(String),
     Binary(String, Box<Expression>, Box<Expression>),
     Call(String, Vec<Expression>),
+    Conditional {
+        cond_expr: Box<Expression>,
+        if_block_expr: Box<Expression>,
+        else_block_expr: Box<Expression>,
+    },
 }

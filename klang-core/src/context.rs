@@ -181,6 +181,7 @@ impl<'a, 'ctx> Compiler<'a, 'ctx> {
                 }
                 None => Err("Unknown function."),
             },
+            Expression::Conditional { .. } => todo!(),
         }
     }
 
