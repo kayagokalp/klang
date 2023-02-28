@@ -10,6 +10,23 @@ use klang_parse::{lexer::tokenize, parser::parse, token::Token};
 
 pub type ParseResult = Result<(Vec<ASTNode>, Vec<Token>)>;
 
+#[no_mangle]
+pub extern "C" fn printd(x: f64) -> f64 {
+    println!("> {x} <");
+    x
+}
+
+#[no_mangle]
+pub extern "C" fn putchard(x: f64) -> f64 {
+    print!("{}", x as u8 as char);
+    x
+}
+
+// Adding the functions above to a global array,
+// so Rust compiler won't remove them.
+#[used]
+static EXTERNAL_FNS: [extern "C" fn(f64) -> f64; 2] = [putchard, printd];
+
 /// Parse the given_input_str and return the complete AST.
 pub fn parse_to_ast(input_str: &str) -> ParseResult {
     let token_stream = tokenize(input_str)?;

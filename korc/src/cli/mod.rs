@@ -1,8 +1,8 @@
-mod build;
+mod run;
 
 use anyhow::Result;
-pub use build::Command as BuildCommand;
 use clap::{Parser, Subcommand};
+pub use run::Command as RunCommand;
 
 #[derive(Debug, Parser)]
 #[clap(name = "korc", about = "Klang Orchestrator", version)]
@@ -14,12 +14,12 @@ struct Opt {
 
 #[derive(Subcommand, Debug)]
 enum Korc {
-    Build(BuildCommand),
+    Run(RunCommand),
 }
 
 pub fn run_cli() -> Result<()> {
     let opt = Opt::parse();
     match opt.command {
-        Korc::Build(build_command) => build::exec(build_command),
+        Korc::Run(run_command) => run::exec(run_command),
     }
 }

@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::Parser;
 
-/// Compile the current or target project.
+/// Compile and run the current project.
 #[derive(Debug, Default, Parser)]
 pub struct Command {
     /// Start REPL mode.
@@ -18,6 +18,6 @@ pub struct Command {
     pub file_out: bool,
 }
 
-pub(crate) fn exec(build_command: Command) -> Result<()> {
-    crate::ops::korc_build::build(build_command)
+pub(crate) fn exec(run_command: Command) -> Result<()> {
+    crate::ops::korc_run::run(run_command)
 }
