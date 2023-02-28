@@ -181,7 +181,50 @@ impl<'a, 'ctx> Compiler<'a, 'ctx> {
                 }
                 None => Err("Unknown function."),
             },
-            Expression::Conditional { .. } => todo!(),
+            Expression::Conditional {
+                cond_expr,
+                if_block_expr,
+                else_block_expr,
+            } => {
+                let parent = self.fn_value();
+                let zero_const = self.context.f64_type().const_float(0.0);
+
+                let condition_val = self.compile_expr(cond_expr)?;
+                let condition_cmp = self.builder.build_float_compare(
+                    FloatPredicate::ONE,
+                    condition_val,
+                    zero_const,
+                    "ifcond",
+                );
+
+                let if_block = self.context.append_basic_block(parent, "ifblock");
+                let else_block = self.context.append_basic_block(parent, "elseblock");
+                let rest_block = self.context.append_basic_block(parent, "rest");
+
+                self.builder
+                    .build_conditional_branch(condition_cmp, if_block, else_block);
+
+                //if block
+                self.builder.position_at_end(if_block);
+                let if_block_val = self.compile_expr(if_block_expr)?;
+                self.builder.build_unconditional_branch(rest_block);
+                let if_basic_block = self.builder.get_insert_block().unwrap();
+
+                // else block
+                self.builder.position_at_end(else_block);
+                let else_val = self.compile_expr(else_block_expr)?;
+                self.builder.build_unconditional_branch(rest_block);
+                let else_basic_block = self.builder.get_insert_block().unwrap();
+
+                self.builder.position_at_end(rest_block);
+                let phi = self.builder.build_phi(self.context.f64_type(), "iftmp");
+                phi.add_incoming(&[
+                    (&if_block_val, if_basic_block),
+                    (&else_val, else_basic_block),
+                ]);
+
+                Ok(phi.as_basic_value().into_float_value())
+            }
         }
     }
 
