@@ -31,8 +31,8 @@ pub fn run(cmd: RunCommand) -> Result<()> {
     let context = Context::create();
     let ir_output_module_mb = ast_to_ir(&context, &ast)?;
     let module = context
-         .create_module_from_ir(ir_output_module_mb)
-         .map_err(|e| anyhow::anyhow!("{e:?}"))?;
+        .create_module_from_ir(ir_output_module_mb)
+        .map_err(|e| anyhow::anyhow!("{e:?}"))?;
     if cmd.ir {
         if cmd.file_out {
             let file_name = format!("{KLANG_ENTRY_NAME}{KLANG_DEFAULT_BC_EXTENSION}");
@@ -44,14 +44,17 @@ pub fn run(cmd: RunCommand) -> Result<()> {
         } else {
             module.print_to_stderr()
         }
-    }else {
+    } else {
         let name = "main";
 
-        let execution_engine = module.create_jit_execution_engine(OptimizationLevel::None).map_err(|e| anyhow::anyhow!("{e:?}"))?;
-        let compiled_fn = unsafe { execution_engine.get_function::<unsafe extern "C" fn() -> f64>(name) }?;
-         unsafe {
-             println!("=> {}", compiled_fn.call());
-         }
+        let execution_engine = module
+            .create_jit_execution_engine(OptimizationLevel::None)
+            .map_err(|e| anyhow::anyhow!("{e:?}"))?;
+        let compiled_fn =
+            unsafe { execution_engine.get_function::<unsafe extern "C" fn() -> f64>(name) }?;
+        unsafe {
+            compiled_fn.call();
+        }
     }
     Ok(())
 }

@@ -1,8 +1,8 @@
 mod run;
 
 use anyhow::Result;
-pub use run::Command as RunCommand;
 use clap::{Parser, Subcommand};
+pub use run::Command as RunCommand;
 
 #[derive(Debug, Parser)]
 #[clap(name = "korc", about = "Klang Orchestrator", version)]

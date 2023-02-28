@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::Parser;
 
-/// Compile and run the current project. 
+/// Compile and run the current project.
 #[derive(Debug, Default, Parser)]
 pub struct Command {
     /// Start REPL mode.
