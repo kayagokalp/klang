@@ -30,7 +30,7 @@ pub fn tokenize(input: &str) -> anyhow::Result<TokenStream> {
         let token = if let Some(ident) = cap.name("ident") {
             match ident.as_str() {
                 "fun" => Token::Fun,
-                "pub" => Token::Pub,
+                "use" => Token::Use,
                 "if" => Token::If,
                 "else" => Token::Else,
                 _ => Token::Ident(ident.as_str().to_string()),
@@ -72,9 +72,9 @@ mod test {
 
     #[test]
     fn test_lex_pub_keyword() {
-        let input_str = r#"pub"#;
+        let input_str = r#"use"#;
         let token_stream = tokenize(input_str).unwrap();
-        let expected = vec![Token::Pub];
+        let expected = vec![Token::Use];
         assert_eq!(token_stream, expected)
     }
 

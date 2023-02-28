@@ -1,8 +1,8 @@
 #[derive(PartialEq, Clone, Debug)]
 pub enum Token {
     Fun,
-    Pub,
-    Delimiter, //';' character
+    Use,
+    Delimiter,
     OpeningParenthesis,
     ClosingParenthesis,
     OpeningBrace,

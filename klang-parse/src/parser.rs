@@ -38,7 +38,7 @@ pub fn parse(tokens: &[Token], parsed_tree: &[ASTNode]) -> ParsingResult {
     while let Some(token) = token_stream.last() {
         let result = match token {
             Token::Fun => Function::parse(&mut token_stream),
-            Token::Pub => Prototype::parse(&mut token_stream),
+            Token::Use => Prototype::parse(&mut token_stream),
             Token::Delimiter => {
                 token_stream.pop();
                 continue;
