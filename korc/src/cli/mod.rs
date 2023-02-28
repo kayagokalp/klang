@@ -1,7 +1,7 @@
-mod build;
+mod run;
 
 use anyhow::Result;
-pub use build::Command as BuildCommand;
+pub use run::Command as RunCommand;
 use clap::{Parser, Subcommand};
 
 #[derive(Debug, Parser)]
@@ -14,12 +14,12 @@ struct Opt {
 
 #[derive(Subcommand, Debug)]
 enum Korc {
-    Build(BuildCommand),
+    Run(RunCommand),
 }
 
 pub fn run_cli() -> Result<()> {
     let opt = Opt::parse();
     match opt.command {
-        Korc::Build(build_command) => build::exec(build_command),
+        Korc::Run(run_command) => run::exec(run_command),
     }
 }
