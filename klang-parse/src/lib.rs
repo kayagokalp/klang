@@ -4,7 +4,7 @@ pub mod lexer;
 mod parse;
 pub mod parser;
 mod prototype;
-mod r#pub;
+mod r#use;
 pub mod token;
 
 #[cfg(test)]
@@ -21,7 +21,7 @@ mod test {
 
     #[test]
     fn parse_function_definition() {
-        let input_str = r#"pub kaya();"#;
+        let input_str = r#"use kaya();"#;
         let token_stream = lexer::tokenize(input_str).unwrap();
         let parse_result = parse(&token_stream, &[]).unwrap();
         let expected_tree = vec![ASTNode::ExternNode(Prototype {
@@ -37,7 +37,7 @@ mod test {
 
     #[test]
     fn parse_function_definition_with_leftover_tokens() {
-        let input_str = r#"pub kaya(); pub"#;
+        let input_str = r#"use kaya(); use"#;
         let token_stream = lexer::tokenize(input_str).unwrap();
         let parse_result = parse(&token_stream, &[]).unwrap();
         let expected_tree = vec![ASTNode::ExternNode(Prototype {
@@ -45,7 +45,7 @@ mod test {
             args: vec![],
         })];
 
-        let left_tokens = vec![Token::Pub];
+        let left_tokens = vec![Token::Use];
         let expected_result = (expected_tree, left_tokens);
 
         assert_eq!(parse_result, expected_result)
@@ -186,7 +186,7 @@ mod test {
 
     #[test]
     fn parse_expr_call_with_leftover_tokens() {
-        let input_str = r#"x() pub"#;
+        let input_str = r#"x() use"#;
         let token_stream = lexer::tokenize(input_str).unwrap();
         let parse_result = parse(&token_stream, &[]).unwrap();
         let expected_tree = vec![ASTNode::FunctionNode(Function {
@@ -197,7 +197,7 @@ mod test {
             body: Some(Expression::Call("x".to_string(), vec![])),
         })];
 
-        let left_tokens = vec![Token::Pub];
+        let left_tokens = vec![Token::Use];
         let expected_result = (expected_tree, left_tokens);
 
         assert_eq!(parse_result, expected_result)
