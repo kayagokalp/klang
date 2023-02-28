@@ -229,4 +229,50 @@ mod test {
 
         assert_eq!(parse_result, expected_result)
     }
+
+    #[test]
+    fn parse_expr_conditional() {
+        let input_str = r#"if 5 { 1 } else {2}"#;
+        let token_stream = lexer::tokenize(input_str).unwrap();
+        let parse_result = parse(&token_stream, &[]).unwrap();
+        let expected_tree = vec![ASTNode::FunctionNode(Function {
+            prototype: Prototype {
+                name: "".to_string(),
+                args: vec![],
+            },
+            body: Some(Expression::Conditional {
+                cond_expr: Box::new(Expression::Literal(5.0)),
+                if_block_expr: Box::new(Expression::Literal(1.0)),
+                else_block_expr: Box::new(Expression::Literal(2.0)),
+            }),
+        })];
+
+        let left_tokens = vec![];
+        let expected_result = (expected_tree, left_tokens);
+
+        assert_eq!(parse_result, expected_result)
+    }
+
+    #[test]
+    fn parse_expr_conditional_with_leftover_tokens() {
+        let input_str = r#"if 5 {1} else {2} fun"#;
+        let token_stream = lexer::tokenize(input_str).unwrap();
+        let parse_result = parse(&token_stream, &[]).unwrap();
+        let expected_tree = vec![ASTNode::FunctionNode(Function {
+            prototype: Prototype {
+                name: "".to_string(),
+                args: vec![],
+            },
+            body: Some(Expression::Conditional {
+                cond_expr: Box::new(Expression::Literal(5.0)),
+                if_block_expr: Box::new(Expression::Literal(1.0)),
+                else_block_expr: Box::new(Expression::Literal(2.0)),
+            }),
+        })];
+
+        let left_tokens = vec![Token::Fun];
+        let expected_result = (expected_tree, left_tokens);
+
+        assert_eq!(parse_result, expected_result)
+    }
 }

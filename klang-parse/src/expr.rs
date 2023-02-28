@@ -87,9 +87,62 @@ fn parse_primary_expr(tokens: &mut Vec<Token>) -> PartParsingResult<Expression> 
         Some(&Token::Ident(_)) => parse_ident_expr(tokens),
         Some(&Token::Number(_)) => parse_literal_expr(tokens),
         Some(&Token::OpeningParenthesis) => parse_parenthesis_expr(tokens),
+        Some(&Token::If) => parse_if_else_expr(tokens),
         None => PartParsingResult::NotComplete,
         _ => error("unknown token when expecting an expression"),
     }
+}
+
+fn parse_if_else_expr(tokens: &mut Vec<Token>) -> PartParsingResult<Expression> {
+    // consume `if`
+    tokens.pop();
+    let mut parsed_tokens = vec![Token::If];
+    let cond_partial_parsed = Expression::parse(tokens);
+    let condition = parse_try!(cond_partial_parsed, tokens, parsed_tokens);
+
+    expect_token!(
+        [Token::OpeningBrace, Token::OpeningBrace, ()] <= tokens,
+        parsed_tokens,
+        "expected `{` after if's condition"
+    );
+    let if_block_partial_parsed = Expression::parse(tokens);
+    let if_block_expr = parse_try!(if_block_partial_parsed, tokens, parsed_tokens);
+
+    expect_token!(
+        [Token::ClosingBrace, Token::ClosingBrace, ()] <= tokens,
+        parsed_tokens,
+        "expected `}` after if's body"
+    );
+
+    expect_token!(
+        [Token::Else, Token::Else, ()] <= tokens,
+        parsed_tokens,
+        "expected else after if's body"
+    );
+
+    expect_token!(
+        [Token::OpeningBrace, Token::OpeningBrace, ()] <= tokens,
+        parsed_tokens,
+        "expected `{` after else"
+    );
+
+    let else_block_partial_parsed = Expression::parse(tokens);
+    let else_block_expr = parse_try!(else_block_partial_parsed, tokens, parsed_tokens);
+
+    expect_token!(
+        [Token::ClosingBrace, Token::ClosingBrace, ()] <= tokens,
+        parsed_tokens,
+        "expected `}` after else's body"
+    );
+
+    PartParsingResult::Good(
+        Expression::Conditional {
+            cond_expr: Box::new(condition),
+            if_block_expr: Box::new(if_block_expr),
+            else_block_expr: Box::new(else_block_expr),
+        },
+        parsed_tokens,
+    )
 }
 
 fn parse_ident_expr(tokens: &mut Vec<Token>) -> PartParsingResult<Expression> {

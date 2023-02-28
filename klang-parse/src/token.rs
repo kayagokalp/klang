@@ -11,4 +11,6 @@ pub enum Token {
     Ident(String),
     Number(f64),
     Operator(String),
+    If,
+    Else,
 }
