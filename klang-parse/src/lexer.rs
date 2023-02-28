@@ -31,6 +31,8 @@ pub fn tokenize(input: &str) -> anyhow::Result<TokenStream> {
             match ident.as_str() {
                 "fun" => Token::Fun,
                 "pub" => Token::Pub,
+                "if" => Token::If,
+                "else" => Token::Else,
                 _ => Token::Ident(ident.as_str().to_string()),
             }
         } else if let Some(number) = cap.name("number") {
@@ -133,6 +135,22 @@ mod test {
         let input_str = r#"102"#;
         let token_stream = tokenize(input_str).unwrap();
         let expected = vec![Token::Number(102.0)];
+        assert_eq!(token_stream, expected)
+    }
+
+    #[test]
+    fn test_if_else_stmnt() {
+        let input_str = r#"if a {} else {}"#;
+        let token_stream = tokenize(input_str).unwrap();
+        let expected = vec![
+            Token::If,
+            Token::Ident("a".to_string()),
+            Token::OpeningBrace,
+            Token::ClosingBrace,
+            Token::Else,
+            Token::OpeningBrace,
+            Token::ClosingBrace,
+        ];
         assert_eq!(token_stream, expected)
     }
 }
